@@ -87,7 +87,8 @@ class ParseObject implements Encodable
      *
      * @var array
      */
-    private static $registeredSubclasses = [];
+    //private static $registeredSubclasses = array(); //Original PHP v5.4+
+    private static $registeredSubclasses = array();
 
     /**
      * Create a Parse Object.
@@ -124,10 +125,10 @@ class ParseObject implements Encodable
         }
 
         $this->className = $className;
-        $this->serverData = [];
-        $this->operationSet = [];
-        $this->estimatedData = [];
-        $this->dataAvailability = [];
+        $this->serverData = array();
+        $this->operationSet = array();
+        $this->estimatedData = array();
+        $this->dataAvailability = array();
         if ($objectId || $isPointer) {
             $this->objectId = $objectId;
             $this->hasBeenFetched = false;
@@ -245,7 +246,7 @@ class ParseObject implements Encodable
      *
      * @return bool
      */
-    protected function _isDirty($considerChildren)
+    public function _isDirty($considerChildren) //was protected
     {
         return
             (count($this->operationSet) || $this->objectId === null) ||
@@ -353,7 +354,7 @@ class ParseObject implements Encodable
             throw new Exception('key may not be null.');
         }
         if (!is_array($value)) {
-            $value = [$value];
+            $value = array($value);
         }
         $this->_performOperation($key, new RemoveOperation($value));
     }
@@ -365,7 +366,7 @@ class ParseObject implements Encodable
      */
     public function revert()
     {
-        $this->operationSet = [];
+        $this->operationSet = array();
         $this->rebuildEstimatedData();
     }
 
@@ -531,7 +532,7 @@ class ParseObject implements Encodable
     }
 
     private static function toObjectIdArray(array $objects) {
-        $objectIds = [];
+        $objectIds = array();
         $count = count($objects);
         if (!$count) return $objectIds;
         $className = $objects[0]->getClassName();
@@ -548,7 +549,7 @@ class ParseObject implements Encodable
     }
 
     private static function updateWithFetchedResults(array $objects, array $fetched) {
-        $fetchedObjectsById = [];
+        $fetchedObjectsById = array();
         foreach ($fetched as $object) {
             $fetchedObjectsById[$object->getObjectId()] = $object;
         }
@@ -580,8 +581,8 @@ class ParseObject implements Encodable
                 unset($this->operationSet[$key]);
             }
         }
-        $this->serverData = [];
-        $this->dataAvailability = [];
+        $this->serverData = array();
+        $this->dataAvailability = array();
         $this->mergeFromServer($result, $completeData);
         $this->rebuildEstimatedData();
     }
@@ -647,7 +648,7 @@ class ParseObject implements Encodable
         $this->createdAt = $other->getCreatedAt();
         $this->updatedAt = $other->getUpdatedAt();
         $this->serverData = $other->serverData;
-        $this->operationSet = [];
+        $this->operationSet = array();
         $this->hasBeenFetched = true;
         $this->rebuildEstimatedData();
     }
@@ -688,7 +689,7 @@ class ParseObject implements Encodable
      */
     protected function rebuildEstimatedData()
     {
-        $this->estimatedData = [];
+        $this->estimatedData = array();
         foreach ($this->serverData as $key => $value) {
             $this->estimatedData[$key] = $value;
         }
@@ -754,12 +755,12 @@ class ParseObject implements Encodable
      */
     public static function destroyAll(array $objects, $useMasterKey = false)
     {
-        $errors = [];
+        $errors = array();
         $count = count($objects);
         if ($count) {
             $batchSize = 40;
             $processed = 0;
-            $currentBatch = [];
+            $currentBatch = array();
             $currentcount = 0;
             while ($processed < $count) {
                 $currentcount++;
@@ -767,7 +768,7 @@ class ParseObject implements Encodable
                 if ($currentcount == $batchSize || $processed == $count) {
                     $results = static::destroyBatch($currentBatch);
                     $errors = array_merge($errors, $results);
-                    $currentBatch = [];
+                    $currentBatch = array();
                     $currentcount = 0;
                 }
             }
@@ -783,14 +784,14 @@ class ParseObject implements Encodable
 
     private static function destroyBatch(array $objects, $useMasterKey = false)
     {
-        $data = [];
-        $errors = [];
+        $data = array();
+        $errors = array();
         foreach ($objects as $object) {
-            $data[] = [
+            $data[] = array(
                 "method" => "DELETE",
                 "path"   => "/1/classes/".$object->getClassName().
                     "/".$object->getObjectId(),
-            ];
+            );
         }
         $sessionToken = null;
         if (ParseUser::getCurrentUser()) {
@@ -798,7 +799,7 @@ class ParseObject implements Encodable
         }
         $result = ParseClient::_request(
             "POST", "/1/batch", $sessionToken,
-            json_encode(["requests" => $data]),
+            json_encode( array("requests" => $data) ),
             $useMasterKey
         );
         foreach ($objects as $key => $object) {
@@ -806,10 +807,10 @@ class ParseObject implements Encodable
                 $error = $result[$key]['error']['error'];
                 $code = isset($result[$key]['error']['code']) ?
                     $result[$key]['error']['code'] : -1;
-                $errors[] = [
+                $errors[] = array(
                     'error' => $error,
                     'code'  => $code,
-                ];
+                );
             }
         }
 
@@ -874,7 +875,7 @@ class ParseObject implements Encodable
      */
     public function _encode()
     {
-        $out = [];
+        $out = array();
         if ($this->objectId) {
             $out['objectId'] = $this->objectId;
         }
@@ -891,7 +892,7 @@ class ParseObject implements Encodable
             if (is_object($value) && $value instanceof \Parse\Internal\Encodable) {
                 $out[$key] = $value->_encode();
             } elseif (is_array($value)) {
-                $out[$key] = [];
+                $out[$key] = array();
                 foreach ($value as $item) {
                     if (is_object($item) && $item instanceof \Parse\Internal\Encodable) {
                         $out[$key][] = $item->_encode();
@@ -957,8 +958,8 @@ class ParseObject implements Encodable
      */
     private static function deepSave($target, $useMasterKey = false)
     {
-        $unsavedChildren = [];
-        $unsavedFiles = [];
+        $unsavedChildren = array();
+        $unsavedFiles = array();
         static::findUnsavedChildren($target, $unsavedChildren, $unsavedFiles);
         $sessionToken = null;
         if (ParseUser::getCurrentUser()) {
@@ -969,7 +970,7 @@ class ParseObject implements Encodable
             $file->save();
         }
 
-        $objects = [];
+        $objects = array();
         // Get the set of unique objects among the children.
         foreach ($unsavedChildren as &$obj) {
             if (!in_array($obj, $objects, true)) {
@@ -979,8 +980,8 @@ class ParseObject implements Encodable
         $remaining = $objects;
 
         while (count($remaining) > 0) {
-            $batch = [];
-            $newRemaining = [];
+            $batch = array();
+            $newRemaining = array();
 
             foreach ($remaining as $key => &$object) {
                 if (count($batch) > 40) {
@@ -999,7 +1000,7 @@ class ParseObject implements Encodable
                 throw new Exception("Tried to save a batch with a cycle.");
             }
 
-            $requests = [];
+            $requests = array();
             foreach ($batch as $obj) {
                 $json = $obj->getSaveJSON();
                 $method = 'POST';
@@ -1008,10 +1009,10 @@ class ParseObject implements Encodable
                     $path .= '/'.$obj->getObjectId();
                     $method = 'PUT';
                 }
-                $requests[] = ['method' => $method,
+                $requests[] = array('method' => $method,
                     'path'              => $path,
                     'body'              => $json,
-                ];
+                );
             }
 
             if (count($requests) === 1) {
@@ -1024,10 +1025,10 @@ class ParseObject implements Encodable
             } else {
                 $result = ParseClient::_request(
                     'POST', '/1/batch', $sessionToken,
-                    json_encode(["requests" => $requests]), $useMasterKey
+                    json_encode( array("requests" => $requests) ), $useMasterKey
                 );
 
-                $errorCollection = [];
+                $errorCollection = array();
 
                 foreach ($batch as $key => &$obj) {
                     if (isset($result[$key]['success'])) {
@@ -1037,17 +1038,17 @@ class ParseObject implements Encodable
                         $error = $response['error']['error'];
                         $code = isset($response['error']['code']) ?
                             $response['error']['code'] : -1;
-                        $errorCollection[] = [
+                        $errorCollection[] = array(
                             'error'  => $error,
                             'code'   => $code,
                             'object' => $obj,
-                        ];
+                        );
                     } else {
-                        $errorCollection[] = [
+                        $errorCollection[] = array(
                             'error'  => 'Unknown error in batch save.',
                             'code'   => -1,
                             'object' => $obj,
-                        ];
+                        );
                     }
                 }
                 if (count($errorCollection)) {
@@ -1099,7 +1100,7 @@ class ParseObject implements Encodable
      * @return mixed The result of calling mapFunction on the root object.
      */
     private static function traverse($deep, &$object, $mapFunction,
-        $seen = []
+        $seen = array()
     ) {
         if ($object instanceof ParseObject) {
             if (in_array($object, $seen, true)) {
@@ -1180,7 +1181,7 @@ class ParseObject implements Encodable
     {
         $this->applyOperations($this->operationSet, $this->serverData);
         $this->mergeFromServer($result);
-        $this->operationSet = [];
+        $this->operationSet = array();
         $this->rebuildEstimatedData();
     }
 
@@ -1218,10 +1219,10 @@ class ParseObject implements Encodable
             throw new \Exception("Can't serialize an unsaved Parse.Object");
         }
 
-        return [
+        return array(
                 '__type'    => "Pointer",
                 'className' => $this->className,
-                'objectId'  => $this->objectId, ];
+                'objectId'  => $this->objectId, );
     }
 
     /**

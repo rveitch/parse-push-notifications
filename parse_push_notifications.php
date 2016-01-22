@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Parse Push Notification Tester
+Plugin Name: FCC Parse Push Notification Tester
 Plugin URI: https://github.com/rveitch/parse-push-notifications
 Description: This plugin allows you to send Parse.com Push Notifications directly from your WordPress admin dashboard.
 Author:  Ryan Veitch
@@ -49,7 +49,7 @@ function parse_push_notifications_send($message){
 	//$data = array("alert" => $message);
 
     ParsePush::send(array(
-      "channels" => [ "Ryan" ],
+      "channels" => array( "Ryan" ),
       data => array(
         "alert" => $message,
       )
@@ -69,7 +69,7 @@ function parse_push_notifications_send($message){
   }
 
 
-/*************************** Admin Dashboard Menu *****************************
+/*************************** PARSE-PN Admin Dashboard Menu ********************
 *******************************************************************************
 * Admin dashboard menu functions.
 */
@@ -95,7 +95,7 @@ function wp_parse_pn_admin_init() {
   register_setting('wp-parse-pn-settings-group', 'pn_app_restkey');
 }
 
-/*************************** Admin Dashboard Page *****************************
+/*************************** PARSE-PN Dashboard Page **************************
 *******************************************************************************
 * Create admin dashboard page.
 */

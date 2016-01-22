@@ -92,11 +92,11 @@ final class ParseClient
         self::$masterKey = $master_key;
         self::$enableCurlExceptions = $enableCurlExceptions;
         if (!static::$storage) {
-            if (session_status() === PHP_SESSION_ACTIVE) {
+            //if (session_status() === PHP_SESSION_ACTIVE) {
                 self::setStorage(new ParseSessionStorage());
-            } else {
-                self::setStorage(new ParseMemoryStorage());
-            }
+            //} else {
+            //    self::setStorage(new ParseMemoryStorage());
+            //}
         }
     }
 
@@ -113,9 +113,8 @@ final class ParseClient
     public static function _encode($value, $allowParseObjects)
     {
         if ($value instanceof \DateTime) {
-            return [
-                '__type' => 'Date', 'iso' => self::getProperDateFormat($value),
-            ];
+            //return [ '__type' => 'Date', 'iso' => self::getProperDateFormat($value), ]; //Original PHP v5.4+
+            return array( '__type' => 'Date', 'iso' => self::getProperDateFormat($value), );
         }
 
         if ($value instanceof \stdClass) {
@@ -201,7 +200,8 @@ final class ParseClient
                 return $data;
             }
 
-            $newDict = [];
+            //$newDict = array(); //Original PHP v5.4+
+            $newDict = array(); //Original PHP v5.4+
             foreach ($data as $key => $value) {
                 $newDict[$key] = static::_decode($value);
             }
@@ -222,7 +222,8 @@ final class ParseClient
      */
     public static function _encodeArray($value, $allowParseObjects)
     {
-        $output = [];
+        //$output = array();  //Original PHP v5.4+
+        $output = array();  //Original PHP v5.4+
         foreach ($value as $key => $item) {
             $output[$key] = self::_encode($item, $allowParseObjects);
         }
@@ -354,8 +355,8 @@ final class ParseClient
      */
     public static function _getRequestHeaders($sessionToken, $useMasterKey)
     {
-        $headers = ['X-Parse-Application-Id: '.self::$applicationId,
-            'X-Parse-Client-Version: '.self::VERSION_STRING, ];
+        //$headers = ['X-Parse-Application-Id: '.self::$applicationId, 'X-Parse-Client-Version: '.self::VERSION_STRING, ]; //Original PHP v5.4+
+        $headers = array('X-Parse-Application-Id: '.self::$applicationId, 'X-Parse-Client-Version: '.self::VERSION_STRING, ); //Original PHP v5.4+
         if ($sessionToken) {
             $headers[] = 'X-Parse-Session-Token: '.$sessionToken;
         }

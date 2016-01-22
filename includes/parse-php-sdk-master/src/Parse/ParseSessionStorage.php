@@ -18,13 +18,13 @@ class ParseSessionStorage implements ParseStorageInterface
 
     public function __construct()
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            throw new ParseException(
-                'PHP session_start() must be called first.'
-            );
-        }
+      //  if (session_status() !== PHP_SESSION_ACTIVE) {
+      //      throw new ParseException(
+      //          'PHP session_start() must be called first.'
+      //      );
+      //  }
         if (!isset($_SESSION[$this->storageKey])) {
-            $_SESSION[$this->storageKey] = [];
+            $_SESSION[$this->storageKey] = array();
         }
     }
 
@@ -49,7 +49,7 @@ class ParseSessionStorage implements ParseStorageInterface
 
     public function clear()
     {
-        $_SESSION[$this->storageKey] = [];
+        $_SESSION[$this->storageKey] = array();
     }
 
     public function save()

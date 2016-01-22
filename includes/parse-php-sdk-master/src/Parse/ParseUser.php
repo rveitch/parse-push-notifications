@@ -135,7 +135,7 @@ class ParseUser extends ParseObject
                 "Cannot log in user with an empty password."
             );
         }
-        $data = ["username" => $username, "password" => $password];
+        $data = array("username" => $username, "password" => $password);
         $result = ParseClient::_request("GET", "/1/login", "", $data);
         $user = new static();
         $user->_mergeAfterFetch($result);
@@ -170,10 +170,10 @@ class ParseUser extends ParseObject
             $expiration_date = new DateTime();
             $expiration_date->setTimestamp(time() + 86400 * 60);
         }
-        $data = ["facebook" => [
+        $data = array("facebook" => array(
             "id" => $id, "access_token" => $access_token,
             "expiration_date" => ParseClient::getProperDateFormat($expiration_date)
-        ]];
+        ));
         $result = ParseClient::_request("POST", "/1/users", "", $data);
         $user = new ParseUser();
         $user->_mergeAfterFetch($result);
@@ -210,12 +210,12 @@ class ParseUser extends ParseObject
             $expiration_date = new DateTime();
             $expiration_date->setTimestamp(time() + 86400 * 60);
         }
-        $data = ["authData" =>
-                    ["facebook" => [
+        $data = array("authData" =>
+                    array("facebook" => array(
                         "id" => $id, "access_token" => $access_token,
                         "expiration_date" => ParseClient::getProperDateFormat($expiration_date)
-                    ]]
-                ];
+                    ))
+                );
         $result = ParseClient::_request(
             "PUT", "/1/users/" + $this->getObjectId(),
             $this->getSessionToken(), $data, $useMasterKey
@@ -315,7 +315,7 @@ class ParseUser extends ParseObject
             foreach ($userData as $key => $value) {
                 $user->set($key, $value);
             }
-            $user->_opSetQueue = [];
+            $user->_opSetQueue = array();
             static::$currentUser = $user;
 
             return $user;
@@ -390,7 +390,7 @@ class ParseUser extends ParseObject
      */
     public static function requestPasswordReset($email)
     {
-        $json = json_encode(['email' => $email]);
+        $json = json_encode(array('email' => $email));
         ParseClient::_request('POST', '/1/requestPasswordReset', null, $json);
     }
 

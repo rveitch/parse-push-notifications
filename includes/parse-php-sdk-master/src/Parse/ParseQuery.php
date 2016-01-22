@@ -21,28 +21,28 @@ class ParseQuery
      *
      * @var array
      */
-    private $where = [];
+    private $where = array();
 
     /**
      * Order By keys.
      *
      * @var array
      */
-    private $orderBy = [];
+    private $orderBy = array();
 
     /**
      * Include nested objects.
      *
      * @var array
      */
-    private $includes = [];
+    private $includes = array();
 
     /**
      * Include certain keys only.
      *
      * @var array
      */
-    private $selectedKeys = [];
+    private $selectedKeys = array();
 
     /**
      * Skip from the beginning of the search results.
@@ -121,7 +121,7 @@ class ParseQuery
     private function addCondition($key, $condition, $value)
     {
         if (!isset($this->where[$key])) {
-            $this->where[$key] = [];
+            $this->where[$key] = array();
         }
         $this->where[$key][$condition] = ParseClient::_encode($value, true);
     }
@@ -239,7 +239,7 @@ class ParseQuery
      */
     public function _getOptions()
     {
-        $opts = [];
+        $opts = array();
         if (!empty($this->where)) {
             $opts['where'] = $this->where;
         }
@@ -279,7 +279,7 @@ class ParseQuery
         if (count($result)) {
             return $result[0];
         } else {
-            return [];
+            return array();
         }
     }
 
@@ -344,7 +344,7 @@ class ParseQuery
             '/1/classes/'.$this->className.
             '?'.$queryString, $sessionToken, null, $useMasterKey
         );
-        $output = [];
+        $output = array();
         foreach ($result['results'] as $row) {
             $obj = ParseObject::create($this->className, $row['objectId']);
             $obj->_mergeAfterFetchWithSelectedKeys($row, $this->selectedKeys);
@@ -392,7 +392,7 @@ class ParseQuery
      */
     public function ascending($key)
     {
-        $this->orderBy = [];
+        $this->orderBy = array();
 
         return $this->addAscending($key);
     }
@@ -426,7 +426,7 @@ class ParseQuery
      */
     public function descending($key)
     {
-        $this->orderBy = [];
+        $this->orderBy = array();
 
         return $this->addDescending($key);
     }
@@ -542,7 +542,7 @@ class ParseQuery
     {
         $this->addCondition(
             $key, '$within',
-            ['$box' => [$southwest, $northeast]]
+            array('$box' => array($southwest, $northeast))
         );
 
         return $this;
@@ -676,7 +676,7 @@ class ParseQuery
         $queryParam["className"] = $query->className;
         $this->addCondition(
             $key, '$select',
-            ['key' => $queryKey, 'query' => $queryParam]
+            array('key' => $queryKey, 'query' => $queryParam)
         );
 
         return $this;
@@ -700,7 +700,7 @@ class ParseQuery
         $queryParam["className"] = $query->className;
         $this->addCondition(
             $key, '$dontSelect',
-            ['key' => $queryKey, 'query' => $queryParam]
+            array('key' => $queryKey, 'query' => $queryParam)
         );
 
         return $this;
@@ -743,7 +743,7 @@ class ParseQuery
      */
     private function _or($queries)
     {
-        $this->where['$or'] = [];
+        $this->where['$or'] = array();
         $length = count($queries);
         for ($i = 0; $i < $length; $i++) {
             $this->where['$or'][] = $queries[$i]->where;
